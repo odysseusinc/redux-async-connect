@@ -113,11 +113,13 @@ class ReduxAsyncConnect extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
+    if (this.props !== nextProps)
+      this.setState(nextProps)
     this.loadAsyncData(nextProps);
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    return this.state.propsToShow !== nextState.propsToShow;
+    return this.state.propsToShow !== nextState.propsToShow || this.props !== nextProps;
   }
 
   loadAsyncData(props) {
@@ -146,8 +148,9 @@ class ReduxAsyncConnect extends React.Component {
   }
 
   render() {
-    const {propsToShow} = this.state;
-    return propsToShow && this.props.render(propsToShow);
+    // const {propsToShow} = this.state;
+    // return propsToShow && this.props.render(propsToShow);
+    return this.props.render(this.props);
   }
 }
 
