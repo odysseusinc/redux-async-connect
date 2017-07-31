@@ -72,6 +72,12 @@ export function loadOnServer(args) {
 
 let loadDataCounter = 0;
 
+function assembleRoutePath(routes) {
+  if (routes && routes.map) {
+    return routes.map(route => route.path).join('/').replace('//', '/');
+  }
+}
+
 class ReduxAsyncConnect extends React.Component {
   static propTypes = {
     components: array.isRequired,
@@ -113,14 +119,22 @@ class ReduxAsyncConnect extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.props !== nextProps)
+    if (this.props !== nextProps) {
       this.setState(nextProps)
-    this.loadAsyncData(nextProps);
+    }
+
+    const prevRoute = assembleRoutePath(this.props.routes);
+    const nextRoute = assembleRoutePath(nextProps.routes);
+    // Load data only when componentWillMount would be called,
+    // so on path change
+    if (prevRoute != nextRoute) {
+      this.loadAsyncData(nextProps);
+    }
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    return this.state.propsToShow !== nextState.propsToShow || this.props !== nextProps;
-  }
+  // shouldComponentUpdate(nextProps, nextState) {
+  //   return this.state.propsToShow !== nextState.propsToShow || this.props !== nextProps;
+  // }
 
   loadAsyncData(props) {
     const store = this.context.store;
